@@ -6,6 +6,12 @@ const glob = require('glob'); //这里的glob是nodejs的glob模块，是用来�
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin'); //压缩css代码
 const MiniCssExtractPlugin = require('mini-css-extract-plugin'); //打包分离css
 const devMode = process.env.NODE_ENV;
+
+function resolve(dir) {
+    console.log(path.join(__dirname, '..', dir),"aaaaaaaaaaaaaaaaaa");
+    return path.join(__dirname, '..', dir)
+}
+
 module.exports = {
     entry: getEntry('./src/pages/**/*.js', "js"),
     output: {
@@ -21,7 +27,7 @@ module.exports = {
         //     filename: 'css/[name].css'
         // }),
         new MiniCssExtractPlugin({
-            filename: 'css/[name].css'
+            filename: 'css/[name]-[hash].css'
         }),
         new OptimizeCssAssetsPlugin({
             assetNameRegExp: /\.css/g, //需要根据自己打包出来的文件名来写正则匹配这个配置是我自己的
@@ -94,6 +100,17 @@ module.exports = {
                 }
             },
         ]
+    },
+    resolve: {
+        extensions: ['.js', '.css', 'scss', '.json'],
+        alias: {
+            "@": resolve('src'),
+            "@js": resolve('src/common/js'),
+            "@css": resolve('src/common/css'),
+            "@common": resolve('src/components'),
+            "@iconfont": resolve('src/assets/iconfont'),
+            "@images": resolve('src/assets/images')
+        }
     }
 };
 
