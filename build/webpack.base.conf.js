@@ -2,13 +2,12 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin'); //重新生成dist/index.html
 const webpack = require('webpack');
 const glob = require('glob'); //这里的glob是nodejs的glob模块，是用来读取webpack入口目录文件的
-
-const entrys = getEntry('./src/pages/**/*.js',"js");
+// const ExtractTextPlugin = require("extract-text-webpack-plugin"); //分离css(与 webpack 4 不太兼容)
+const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin'); //压缩css代码
+const MiniCssExtractPlugin = require('mini-css-extract-plugin'); //打包分离css
+const devMode = process.env.NODE_ENV;
 module.exports = {
-    // entry: {
-    //     index: './src/pages/index/index.js'
-    // },
-    entry: entrys,
+    entry: getEntry('./src/pages/**/*.js', "js"),
     output: {
         filename: 'js/[name]-[hash].js',
         path: path.resolve(__dirname, '../dist'),
@@ -17,7 +16,24 @@ module.exports = {
     mode: "production",
     plugins: [
         new webpack.NamedModulesPlugin(),
-        new webpack.HotModuleReplacementPlugin()
+        new webpack.HotModuleReplacementPlugin(),
+        // new ExtractTextPlugin({
+        //     filename: 'css/[name].css'
+        // }),
+        new MiniCssExtractPlugin({
+            filename: 'css/[name].css'
+        }),
+        new OptimizeCssAssetsPlugin({
+            assetNameRegExp: /\.css/g, //需要根据自己打包出来的文件名来写正则匹配这个配置是我自己的
+            cssProcessor: require("cssnano"),
+            cssProcessorOptions: {
+                discardComments: {
+                    removeAll: true
+                },
+                parser: require("postcss-safe-parser")
+            },
+            canPrint: true //是否在控制台打印消息
+        }),
     ],
     devServer: {
         // contentBase: path.join(__dirname, "../dist"),//服务器从哪里提供内容。只有在你想要提供静态文件时才需要
@@ -28,22 +44,34 @@ module.exports = {
     },
     module: {
         rules: [{
-                test: /\.css$/,
+                // test: /\.css$/,
+                // use: ExtractTextPlugin.extract({
+                //     fallback: "style-loader",
+                //     use:['css-loader','postcss-loader'],
+                //     publicPath:'../' //解决css背景图的路径问题
+                // }),
+                test: /\.(le|sc|c)ss$/,
                 use: [
-                    'style-loader',
-                    'css-loader'
-                ]
+                    devMode ? 'style-loader' : MiniCssExtractPlugin.loader,
+                    'css-loader',
+                    'postcss-loader',
+                    'sass-loader',
+                ],
+                include: path.join(__dirname, '../src'), //限制范围，提高打包速度
             },
-            // 'transform-runtime' 插件告诉 babel 要引用 runtime 来代替注入。
+            // {
+            //     test: /\.scss$/,
+            //     exclude: /(node_modules|bower_components)/,
+            //     // use: ExtractTextPlugin.extract({
+            //     //     fallback: "style-loader",
+            //     //     use: ['css-loader', 'sass-loader']
+            //     // })
+            // },
             {
                 test: /\.js$/,
                 exclude: /(node_modules|bower_components)/,
                 use: {
-                  loader: 'babel-loader',
-                  options: {
-                    // presets: ['@babel/preset-env'],
-                    // plugins: ['@babel/transform-runtime']
-                  }
+                    loader: 'babel-loader',
                 }
             },
             {
@@ -69,8 +97,9 @@ module.exports = {
     }
 };
 
-function getEntry(globPath,type) {
-    var entries = {},  tmp, pathname, newPath = [];
+function getEntry(globPath, type) {
+    var entries = {},
+        tmp, pathname, newPath = [];
     glob.sync(globPath).map(function (v) {
         if (v.indexOf("components") == -1) {
             newPath.push(v);
@@ -79,9 +108,9 @@ function getEntry(globPath,type) {
     newPath.forEach(function (entry) {
         var entryCopy = entry.replace(path.extname(entry), ""),
             entryCopyArr = entryCopy.split('/');
-        if(type=="html"){
+        if (type == "html") {
             tmp = entryCopyArr.length == 4 ? entryCopyArr.splice(-1, 1) : entryCopyArr.splice(-3, 1).concat(entryCopyArr.splice(-1, 1));
-        }else{
+        } else {
             tmp = entryCopyArr.length == 5 ? entryCopyArr.splice(-1, 1) : entryCopyArr.splice(-3, 1).concat(entryCopyArr.splice(-1, 1));
         }
         tmp = tmp.join("/");
@@ -91,10 +120,8 @@ function getEntry(globPath,type) {
     return entries;
 }
 
-var pages = getEntry('src/pages/**/*.html','html');
-console.log(pages, "pages");
+var pages = getEntry('src/pages/**/*.html', 'html');
 for (var pathname in pages) {
-    console.log(pathname);
     // 配置生成的html文件，定义路径等
     var conf = {
         filename: pathname + '.html',
