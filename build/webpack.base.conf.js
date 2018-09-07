@@ -3,7 +3,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin'); //重新生成dist/ind
 // const ExtractTextPlugin = require("extract-text-webpack-plugin"); //分离css(与 webpack 4 不太兼容)
 const MiniCssExtractPlugin = require('mini-css-extract-plugin'); //打包分离css
 const utils = require('./utils.js');
-const devMode = process.env.NODE_ENV;
+const devMode = process.env.NODE_ENV !== 'production';
 
 function resolve(dir) {
     return path.join(__dirname, '..', dir)
@@ -16,7 +16,7 @@ module.exports = {
         path: path.resolve(__dirname, '../dist'),
         // publicPath: './'    //有这个的话开发环境需要指定服务器从打包后的静态文件读取
     },
-    mode: "production",
+    mode: devMode ? "development" : "production",
     plugins: [
         // new ExtractTextPlugin({
         //     filename: 'css/[name].css'
@@ -34,21 +34,20 @@ module.exports = {
                 //     publicPath:'../' //解决css背景图的路径问题
                 // }),
                 test: /\.(le|sc|c)ss$/,
-                use:[
-                    {
-                        loader:devMode ? 'style-loader' : MiniCssExtractPlugin.loader,
-                        options:{
+                use: [{
+                        loader: devMode ? 'style-loader' : MiniCssExtractPlugin.loader,
+                        options: devMode ? {} : {
                             publicPath: '../'
                         }
                     },
                     {
-                        loader:'css-loader' 
+                        loader: 'css-loader'
                     },
                     {
-                        loader:'postcss-loader' 
+                        loader: 'postcss-loader'
                     },
                     {
-                        loader:'sass-loader' 
+                        loader: 'sass-loader'
                     }
                 ],
                 include: path.join(__dirname, '../src'), //限制范围，提高打包速度
@@ -91,9 +90,11 @@ module.exports = {
             //相当于可以使用iframe ，具体用法查看html-loader
             {
                 test: /\.html$/,
-                use: {
+                use: [{
                     loader: 'html-loader'
-                }
+                }, {
+                    loader: 'raw-loader'
+                }]
             },
         ]
     },
