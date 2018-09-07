@@ -1,17 +1,17 @@
 {
-  "name": "webpack-vue-multipage",
+  "name": "webpack-multipage-app",
   "sideEffects": false,
   "version": "1.0.0",
-  "description": "",
+  "description": "没有引入任何框架的webpack多页应用模板",
   "private": true,
   "scripts": {
     "build": "webpack --config build/webpack.prod.js --mode=production",
     "start": "webpack-dev-server --open --config build/webpack.dev.js --mode=development",
-    "dev": "webpack-dev-server --open --mode=development",
+    "dev": "npm start",
     "watch": "webpack --watch --config build/webpack.prod.js --mode=production"
   },
   "keywords": [],
-  "author": "",
+  "author": "熊超",
   "license": "ISC",
   "devDependencies": {
     "autoprefixer": "^9.1.5",
