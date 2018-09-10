@@ -13,3 +13,7 @@
 ##### 解决办法：
 1. 将路径写全，即不要使用配置文件中的路径别名，直接使用相对路径或者绝对路径
 2. 将css文件改写为sass/scss文件，即不引用css转而将样式写在sass/scss文件中引入。
+
+### webpack4弃用extract-text-webpack-plugin推荐使用mini-css-extract-plugin分离css问题：
+1. mini-css-extract-plugin和style-loader无法共存。npm官方说明：This plugin should be used only on production builds without style-loader in the loaders chain, especially if you want to have HMR in development.
+2. 由于mini-css-extract-plugin和style-loader无法共存，为保证在开发阶段实现css热替换，将使用style-loader不适用mini-css-extract-plugin，所以在开发阶段无法将css分离。
