@@ -1,7 +1,10 @@
+process.env.NODE_ENV = 'development';
+
 const path = require('path');
 const webpack = require('webpack');
 const merge = require('webpack-merge');
 const common = require('./webpack.base.conf');
+
 
 module.exports = merge(common, {
     devtool: 'inline-source-map',

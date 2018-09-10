@@ -1,3 +1,5 @@
+process.env.NODE_ENV = 'production';
+
 const path = require('path');
 const webpack = require('webpack');
 const merge = require('webpack-merge');
@@ -7,6 +9,7 @@ const CleanWebpackPlugin = require('clean-webpack-plugin'); //清理dist文件�
 // var fs = require("fs");
 const common = require('./webpack.base.conf');
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin'); //压缩css代码
+
 
 module.exports = merge(common, {
     devtool: false, //避免在生产中使用 inline-*** 和 eval-***，因为它们可以增加 bundle 大小，并降低整体性能。

@@ -16,7 +16,7 @@ module.exports = {
         path: path.resolve(__dirname, '../dist'),
         // publicPath: './'    //有这个的话开发环境需要指定服务器从打包后的静态文件读取
     },
-    mode: devMode ? "development" : "production",
+    mode: process.env.NODE_ENV,
     plugins: [
         // new ExtractTextPlugin({
         //     filename: 'css/[name].css'
@@ -34,8 +34,9 @@ module.exports = {
                 //     publicPath:'../' //解决css背景图的路径问题
                 // }),
                 test: /\.(le|sc|c)ss$/,
-                use: [{
-                        loader: devMode ? 'style-loader' : MiniCssExtractPlugin.loader,
+                use: [
+                    {
+                        loader: devMode ? 'style-loader' : MiniCssExtractPlugin.loader,//开发有css热更新，没有css分离；生产有css分离；
                         options: devMode ? {} : {
                             publicPath: '../'
                         }
