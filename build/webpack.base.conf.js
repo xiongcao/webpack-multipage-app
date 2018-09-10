@@ -1,4 +1,6 @@
 const path = require('path');
+
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin'); //重新生成dist/index.html
 // const ExtractTextPlugin = require("extract-text-webpack-plugin"); //分离css(与 webpack 4 不太兼容)
 const MiniCssExtractPlugin = require('mini-css-extract-plugin'); //打包分离css
@@ -23,7 +25,12 @@ module.exports = {
         // }),
         new MiniCssExtractPlugin({
             filename: 'css/[name]-[hash].css'
-        })
+        }),
+        //复制icon
+        new CopyWebpackPlugin([{
+            from: path.resolve(__dirname, '../favicon.ico'),
+            to: path.resolve(__dirname, '../dist/favicon.ico')
+        }])
     ],
     module: {
         rules: [{
@@ -34,9 +41,8 @@ module.exports = {
                 //     publicPath:'../' //解决css背景图的路径问题
                 // }),
                 test: /\.(le|sc|c)ss$/,
-                use: [
-                    {
-                        loader: devMode ? 'style-loader' : MiniCssExtractPlugin.loader,//开发有css热更新，没有css分离；生产有css分离；
+                use: [{
+                        loader: devMode ? 'style-loader' : MiniCssExtractPlugin.loader, //开发有css热更新，没有css分离；生产有css分离；
                         options: devMode ? {} : {
                             publicPath: '../'
                         }
@@ -116,6 +122,7 @@ for (let pathname in pages) {
     let conf = {
         filename: pathname + '.html',
         template: pages[pathname], // 模板路径
+        // favicon: 'favicon.ico',
         chunks: [pathname, 'vendor', 'manifest'], // 每个html引用的js模块
         inject: true // js插入位置
     };
