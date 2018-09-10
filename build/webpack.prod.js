@@ -16,7 +16,7 @@ module.exports = merge(common, {
     output: {
         // publicPath: './' //并不会对生成文件的路径造成影响，主要是对你的页面里面引入的资源的路径做对应的补全
         // publicPath: 'https://www.kxlist.com/'
-        chunkFilename: 'js/[name].js'
+        chunkFilename: 'js/[name]-[hash].js'
     },
     plugins: [
         new UglifyJSPlugin({
@@ -77,12 +77,18 @@ module.exports = merge(common, {
                 vendors: {
                     test: /[\\/]node_modules[\\/]/,
                     priority: -10
-                },
-                default: {
-                    minChunks: 2,
-                    priority: -20,
-                    reuseExistingChunk: true
                 }
+                // // default: {
+                // //     minChunks: 2,
+                // //     priority: -20,
+                // //     reuseExistingChunk: true
+                // // }
+                // styles: {
+                //     name: 'styles',
+                //     test: /\.(sc|le|c)ss$/,
+                //     chunks: 'all',
+                //     enforce: true
+                // }
             }
         }
     }
